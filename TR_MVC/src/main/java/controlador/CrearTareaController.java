@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import modelo.EstadoTarea;
 import modelo.Tarea;
 
 @WebServlet("/CrearTareaController")
@@ -40,11 +41,10 @@ public class CrearTareaController extends HttpServlet {
 				if (nombre != "") {
 					
 					Tarea tarea = new Tarea();
-					Integer index =  tarea.getTareas().size();
 					
-					tarea.setCode(index);
 					tarea.setNombre(nombre);
-					tarea.setEstado("To assign");
+					tarea.setResponsable("");
+					tarea.setEstado(EstadoTarea.TO_ASSIGN);
 					
 					Tarea modeloTarea = new Tarea();
 					modeloTarea.crearTarea(tarea);

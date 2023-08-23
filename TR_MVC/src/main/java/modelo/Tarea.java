@@ -1,26 +1,32 @@
 package modelo;
 
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tarea implements Serializable{
+public class Tarea implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	final String SQL_SELECT_ALL = "SELECT * FROM tarea";
+	final String SQL_INSERT = "INSERT INTO tarea (nombre, responsable, estado) VALUES (?, ?, ?)";
+	final String SQL_UPDATE = "UPDATE tarea SET nombre = ? , responsable = ? , estado = ? WHERE code = ?";
+	
 	private Integer code;
 	private String nombre;
 	private String responsable;
-	private String estado;
-	
-	private static List<Tarea> tareas = new ArrayList<>();
-	
+	private EstadoTarea estado;
+
+	// private static List<Tarea> tareas = new ArrayList<>();
+
 	// CONSTRUCTORS
-	
+
 	public Tarea() {
 	}
 
-	public Tarea(Integer code, String nombre, String estado) {
+	public Tarea(Integer code, String nombre, EstadoTarea estado) {
 		super();
 		this.code = code;
 		this.nombre = nombre;
@@ -29,7 +35,7 @@ public class Tarea implements Serializable{
 	}
 
 	// GETTERS - SETTERS
-	
+
 	public Integer getCode() {
 		return code;
 	}
@@ -54,30 +60,77 @@ public class Tarea implements Serializable{
 		this.responsable = responsable;
 	}
 
-	public String getEstado() {
+	public EstadoTarea getEstado() {
 		return estado;
 	}
 
-	public void setEstado(String estado) {
+	public void setEstado(EstadoTarea estado) {
 		this.estado = estado;
 	}
-	
+
 	// BUSINESS RULES
-	
+
 	public List<Tarea> getTareas() {
+
+		List<Tarea> tareas = new ArrayList<>();
+
+		try {
+			PreparedStatement pstm = BddConexion.getConnection().prepareStatement(SQL_SELECT_ALL);
+			ResultSet rs = pstm.executeQuery();
+
+			while (rs.next()) {
+
+				Tarea tarea = new Tarea();
+				tarea.setCode(rs.getInt("code"));
+				tarea.setNombre(rs.getString("nombre"));
+				tarea.setResponsable(rs.getString("responsable"));
+				tarea.setEstado(EstadoTarea.valueOf(rs.getString("estado")));
+
+				tareas.add(tarea);
+			}
+			BddConexion.cerrar(rs);
+			BddConexion.cerrar(pstm);
+			BddConexion.cerrar();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
 		return tareas;
 	}
-	
+
 	public void crearTarea(Tarea t) {
-		this.getTareas().add(t);
+		/*this.getTareas().add(t);*/
+		try {
+			PreparedStatement pstm = BddConexion.getConnection().prepareStatement(SQL_INSERT);
+			pstm.setString(1, t.getNombre());	
+			pstm.setString(2, t.getResponsable());
+			pstm.setString(3, t.getEstado().name());
+			
+			pstm.executeUpdate();
+			
+			BddConexion.cerrar(pstm);
+			BddConexion.cerrar();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 	
-	public void cabiarEstado() {
+	public void update(Tarea t) {
 		
+		try {
+			PreparedStatement pstm = BddConexion.getConnection().prepareStatement(SQL_UPDATE);
+			pstm.setString(1, t.getNombre());	
+			pstm.setString(2, t.getResponsable());
+			pstm.setString(3, t.getEstado().name());
+			pstm.setInt(4, t.getCode());
+			
+			pstm.executeUpdate();
+			
+			BddConexion.cerrar(pstm);
+			BddConexion.cerrar();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
-	
-	
-	
-	
-	
+
 }
