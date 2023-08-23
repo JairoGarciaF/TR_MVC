@@ -23,7 +23,7 @@
         </a>
 
         <ul class="nav nav-pills">
-            <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Sign out</a></li>
+            <li class="nav-item"><a href="index.html" class="nav-link active" aria-current="page">Sign out</a></li>
 
         </ul>
     </header>
